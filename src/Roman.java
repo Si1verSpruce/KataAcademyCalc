@@ -1,5 +1,4 @@
 class Roman {
-    public static final int MAX_LOWER_NUMBERS_SEQUENCE = 1;
     public static final int MAX_EQUAL_NUMBERS_SEQUENCE = 3;
 
     public static final RomanValue[] ROMAN_VALUES = {
@@ -16,17 +15,21 @@ class Roman {
 
     public static int romanNumberToArabic(String value) throws Exception {
         char[] chars = value.toCharArray();
-        int maxNumber = 0;
+        int[] charValues = new int[chars.length];
         int sum = 0;
-        int lowerSequence = 0;
         int equalSequence = 1;
-        int lastValue = 0;
 
-        for (int i = chars.length - 1; i >= 0; i--) {
+        for (int i = 0; i < chars.length; i++) {
             int charValue = romanDigitToArabic(chars[i]);
 
-            if (charValue >= maxNumber) {
-                if (charValue == maxNumber) {
+            if (i > 0) {
+                if (i > 1) {
+                    if (charValue > charValues[i - 2]) {
+                        throw new Exception();
+                    }
+                }
+
+                if (charValue == charValues[i - 1]) {
                     equalSequence++;
 
                     if (equalSequence > MAX_EQUAL_NUMBERS_SEQUENCE) {
@@ -34,25 +37,19 @@ class Roman {
                     }
                 } else {
                     equalSequence = 1;
-                }
 
-                lowerSequence = 0;
-                maxNumber = charValue;
-                sum += charValue;
-            } else {
-                if (lastValue - charValue == charValue){
-                    throw new Exception();
-                }
+                    if (charValue > charValues[i - 1]) {
+                        if (charValue - charValues[i - 1] == charValues[i - 1]) {
+                            throw new Exception();
+                        }
 
-                sum -= charValue;
-                lowerSequence++;
-
-                if (lowerSequence > MAX_LOWER_NUMBERS_SEQUENCE) {
-                    throw new Exception();
+                        sum -= charValues[i - 1] * 2;
+                    }
                 }
             }
 
-            lastValue = charValue;
+            sum += charValue;
+            charValues[i] = charValue;
         }
 
         return sum;
